@@ -30,7 +30,7 @@ def process_image(image_name: str):
     # Filtros de suavização da imagem
     gaussian_blurred = cv2.GaussianBlur(imagem_gray, (15, 15), 0)
 
-    # Abertura morfológica (dilatação)
+    # Abertura morfológica (erosão e dilatação)
     kernel = np.ones((50, 50), np.uint8)
     opened_image = cv2.morphologyEx(gaussian_blurred, cv2.MORPH_OPEN, kernel)
 

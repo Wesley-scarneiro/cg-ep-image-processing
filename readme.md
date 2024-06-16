@@ -77,3 +77,11 @@ A etapa de erosão em muitas imagens já demonstra uma ótima redução do ruíd
 
 **Com suavização**
 ![Exemplo](output/heic0910i_segmented.jpg)
+
+## Fontes
+
+* Imagens: https://esahubble.org/images/
+* OpenCV: https://docs.opencv.org/4.x/d6/d00/tutorial_py_root.html
+* Matplotlib: https://matplotlib.org/stable/api/index.html
+
+Códigos desenvolvidos a partir 

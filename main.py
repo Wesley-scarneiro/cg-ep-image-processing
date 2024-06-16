@@ -9,14 +9,15 @@ def plot_image_subplot(position, image, title, cmap=None):
     plt.title(title)
     plt.axis('off')
 
-def plot_images(image_rgb, gaussian_blurred, opened_image, segmented_image, result_image, image_name):
+def plot_images(image_rgb, gaussian_blurred, eroded_image, dilated_image, segmented_image, result_image, image_name):
     plt.figure(figsize=(20, 10))
 
     plot_image_subplot(1, image_rgb, 'Original')
-    plot_image_subplot(2, gaussian_blurred, 'Gaussiana Suavizada', cmap='gray')
-    plot_image_subplot(3, opened_image, 'Erosão e dilatação', cmap='gray')
-    plot_image_subplot(4, segmented_image, 'Filtro', cmap='gray')
-    plot_image_subplot(5, result_image, 'Resultado Final')
+    plot_image_subplot(2, gaussian_blurred, 'Suavização Gaussiana', cmap='gray')
+    plot_image_subplot(3, eroded_image, 'Erosão', cmap='gray')
+    plot_image_subplot(4, dilated_image, 'Dilatação', cmap='gray')
+    plot_image_subplot(5, segmented_image, 'Filtro', cmap='gray')
+    plot_image_subplot(6, result_image, 'Resultado Final')
 
     plt.savefig(f'output/{image_name.replace(".jpg", "")}_segmented.jpg')
     plt.show()
@@ -27,20 +28,27 @@ def process_image(image_name: str):
     imagem_rgb = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     imagem_gray = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
 
-    # Filtros de suavização da imagem
+    # Aplicar suavização gaussiana
     gaussian_blurred = cv2.GaussianBlur(imagem_gray, (15, 15), 0)
 
-    # Abertura morfológica (erosão e dilatação)
-    kernel = np.ones((50, 50), np.uint8)
-    opened_image = cv2.morphologyEx(gaussian_blurred, cv2.MORPH_OPEN, kernel)
+    # Definir o kernel para erosão e dilatação
+    kernel = np.ones((25, 25), np.uint8)
 
-    # Thresholding para segmentar a imagem suavizada
-    _, segmented_image = cv2.threshold(opened_image, 40, 255, cv2.THRESH_BINARY)
+    # Erosão
+    eroded_image = cv2.erode(gaussian_blurred, kernel, iterations=1)
+
+    # Dilatação
+    dilated_image = cv2.dilate(eroded_image, kernel, iterations=1)
+
+    # Thresholding para segmentar a imagem dilatada
+    _, segmented_image = cv2.threshold(dilated_image, 40, 255, cv2.THRESH_BINARY)
+
+    # Criar imagem final
     result_image = np.ones_like(imagem_rgb) * 255
     result_image[segmented_image == 255] = imagem_rgb[segmented_image == 255]
 
     # Exibir e salvar o resultado
-    plot_images(imagem_rgb, gaussian_blurred, opened_image, segmented_image, result_image, image_name)
+    plot_images(imagem_rgb, gaussian_blurred, eroded_image, dilated_image, segmented_image, result_image, image_name)
 
 def get_images(directory):
     images = []
